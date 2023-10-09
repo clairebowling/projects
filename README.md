@@ -1,7 +1,7 @@
 # Projects
 This repository contains some of the short coding projects completed during undergraduate level computer science courses. Most projects are a single file and written in C++. 
 
-### [Client-Server](Client-Serverr) :crystal_ball:
+### [Client-Server](Client-Server) :crystal_ball:
 Allows for a client to submit a statement to the fortune teller (server) and receive a random response chosen from a list of string inputs. 
 
 ### Cryptography :closed_lock_with_key:
