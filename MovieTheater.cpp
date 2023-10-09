@@ -1,12 +1,4 @@
 
-// Movie Theater
-
-// Virginia Bowling
-// 00096744
-// vbowlin2@my.athens.edu
-
-// Project 3
-
 #include<iostream>
 #include<string>
 #include<cstdlib>
