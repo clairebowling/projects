@@ -4,41 +4,41 @@ This repository contains some of the short coding projects completed during unde
 ### [Client-Server](Client-Server) :crystal_ball:
 Allows for a client to submit a statement to the fortune teller (server) and receive a random response chosen from a list of string inputs. 
 
-### Cryptography :closed_lock_with_key:
+### [Cryptography](Cryptography) :closed_lock_with_key:
 A collection of programs that encrypt and decrypt using various cryptographic methods.
 
-### DynamicProgramming :moneybag:
+### [DynamicProgramming](DynamicProgramming) :moneybag:
 Calculate differences amongst exchange rates for foreign currencies. 
 
-### averageFromFile :memo: 
+### [averageFromFile](averageFromFile) :memo: 
 Compute the average from a file and write this value to an output file.
 
-### BarberShop :barber:
+### [BarberShop](BarberShop.cpp) :barber:
 Using multiprogramming to solve the classic sleeoing barber problem.
 
-### DivideAndConquerMap :world_map:
+### [DivideAndConquerMap](DivideAndConquerMap.cpp) :world_map:
 Use a divide and conquer algorithm to find convex hull of points on a map.
 
-### GrayCodeTowersOfHanoi :trophy:
+### [GrayCodeTowersOfHanoi](GrayCodeTowersOfHanoi.cpp) :trophy:
 Solve the Towers of Hanoi using Gray Code. 
 
-### HeapSort :open_file_folder:
+### [HeapSort](HeapSort.cpp) :open_file_folder:
 Sorting method for heap data structure. 
 
-### MatrixMultThread :thread:
+### [MatrixMultThread](MatrixMultThread.cpp) :thread:
 Compute matrix multiplication using threads.
 
-### MovieTheater :clapper:
+### [MovieTheater](MovieTheater.cpp) :clapper:
 A simple command line movie theater management program that allows users to view and reserve available seats in a movie theater. 
 
-### ParseTrace :mag:
+### [ParseTrace](ParseTrace.cpp) :mag:
 Use a stack, parse table, and grammar rules to parse a given string.
 
-### RadixSort :bucket:
+### [RadixSort](RadixSort.cpp) :bucket:
 An implementation of the bucket sort method.
 
-### cmdLineParser :computer:
+### [cmdLineParser](cmdLineParser.cpp) :computer:
 Pase command line input.
 
-### random :game_die:
+### [random](random.cpp) :game_die:
 Randomize a vector and return permutaitons by randomly swapping indexes. 
