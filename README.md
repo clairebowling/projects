@@ -14,13 +14,13 @@ Calculate differences amongst exchange rates for foreign currencies.
 Compute the average from a file and write this value to an output file.
 
 ### [BarberShop](BarberShop.cpp) :barber:
-Using multiprogramming to solve the classic sleeoing barber problem.
+Use multithread programming to solve the classic sleeoing barber problem.
 
 ### [DivideAndConquerMap](DivideAndConquerMap.cpp) :world_map:
 Use a divide and conquer algorithm to find convex hull of points on a map.
 
 ### [GrayCodeTowersOfHanoi](GrayCodeTowersOfHanoi.cpp) :trophy:
-Solve the Towers of Hanoi using Gray Code. 
+Gray Code solution to the Towers of Hanoi. 
 
 ### [HeapSort](HeapSort.cpp) :open_file_folder:
 Sorting method for heap data structure. 
@@ -29,7 +29,7 @@ Sorting method for heap data structure.
 Compute matrix multiplication using threads.
 
 ### [MovieTheater](MovieTheater.cpp) :clapper:
-A simple command line movie theater management program that allows users to view and reserve available seats in a movie theater. 
+A simple command line movie theater management program that allows users to view and reserve available seats in a theater. 
 
 ### [ParseTrace](ParseTrace.cpp) :mag:
 Use a stack, parse table, and grammar rules to parse a given string.
