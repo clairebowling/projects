@@ -14,7 +14,7 @@ Calculate differences amongst exchange rates for foreign currencies.
 Compute the average from a file and write this value to an output file.
 
 ### [BarberShop](BarberShop.cpp) :barber:
-Use multithread programming to solve the classic sleeoing barber problem.
+Use multithread programming to solve the classic sleeping barber problem.
 
 ### [DivideAndConquerMap](DivideAndConquerMap.cpp) :world_map:
 Use a divide and conquer algorithm to find convex hull of points on a map.
