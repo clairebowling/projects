@@ -3,21 +3,8 @@
 #include <iomanip>
 #include <string>
 #include <sstream>
-#include <vector> 
-// AES-128 (Nk=4, Nr=10)
-// 128_PLAINTEXT: 00112233445566778899aabbccddeeff
-// 128_KEY: 000102030405060708090a0b0c0d0e0f
-
-// AES-192 (Nk=6, Nr=12) 
-// 192_PLAINTEXT: 00112233445566778899aabbccddeeff
-// 192_KEY: 000102030405060708090a0b0c0d0e0f1011121314151617
-
-// AES-256 (Nk=8, Nr=14)
-// 256_PLAINTEXT: 00112233445566778899aabbccddeeff
-// 256_KEY: 000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f
- 
- //***************************************************************
- 
+#include <vector>
+  
 //CONSTANTS
 const int Nb = 4;   // Num columns
 const int Nk_128 = 4;   // 128 num words
@@ -29,20 +16,20 @@ const int Nr_256 = 14;  // 256 rounds
 
 const uint16_t AES_POLY = 0x11b;
 
-const uint32_t Rcon[] = { 0x00000000,
-           0x01000000, 0x02000000, 0x04000000, 0x08000000,
-           0x10000000, 0x20000000, 0x40000000, 0x80000000,
-           0x1B000000, 0x36000000, 0x6C000000, 0xD8000000,
-           0xAB000000, 0x4D000000, 0x9A000000, 0x2F000000,
-           0x5E000000, 0xBC000000, 0x63000000, 0xC6000000,
-           0x97000000, 0x35000000, 0x6A000000, 0xD4000000,
-           0xB3000000, 0x7D000000, 0xFA000000, 0xEF000000,
-           0xC5000000, 0x91000000, 0x39000000, 0x72000000,
-           0xE4000000, 0xD3000000, 0xBD000000, 0x61000000,
-           0xC2000000, 0x9F000000, 0x25000000, 0x4A000000,
-           0x94000000, 0x33000000, 0x66000000, 0xCC000000,
-           0x83000000, 0x1D000000, 0x3A000000, 0x74000000,
-           0xE8000000, 0xCB000000, 0x8D000000};
+const uint8_t Rcon[] = { 0x00,
+           0x01, 0x02, 0x04, 0x08,
+           0x10, 0x20, 0x40, 0x80,
+           0x1B, 0x36, 0x6C, 0xD8,
+           0xAB, 0x4D, 0x9A, 0x2F,
+           0x5E, 0xBC, 0x63, 0xC6,
+           0x97, 0x35, 0x6A, 0xD4,
+           0xB3, 0x7D, 0xFA, 0xEF,
+           0xC5, 0x91, 0x39, 0x72,
+           0xE4, 0xD3, 0xBD, 0x61,
+           0xC2, 0x9F, 0x25, 0x4A,
+           0x94, 0x33, 0x66, 0xCC,
+           0x83, 0x1D, 0x3A, 0x74,
+           0xE8, 0xCB, 0x8D};
 
 
 const uint8_t s_box[16][16] = {
@@ -85,8 +72,6 @@ const uint8_t inv_s_box[16][16] = {
 
 using namespace std;
 
-string plaintext = ("00112233445566778899aabbccddeeff");
-
 struct Matrix{
     uint8_t data[4][4];
 };
@@ -104,67 +89,59 @@ uint8_t ffMultiply(uint8_t, uint8_t);
 Matrix SubBytes(Matrix&);
 Matrix ShiftRows(Matrix&);
 Matrix MixColumns(Matrix&);
-Matrix AddRoundKey(Matrix&, Word&);
-
-Matrix Cipher(Matrix&, int, Word&);
+Matrix AddRoundKey(Matrix&, Word&, Word&, Word&, Word&);
+Matrix Cipher(string, int, vector<Word>);
 
 // METHODS FOR KEY EXPANSION
 Word SubWord(Word&);
 Word RotWord(Word&);
-void KeyExpansion(uint8_t [], int,  uint8_t [], int, int);
-
+vector<Word> KeyExpansion(string, int, int);
 
 // METHODS FOR INVERSE CIPHER
 Matrix InvShiftRows(Matrix&);
 Matrix InvSubBytes(Matrix&);
 Matrix InvMixColumns(Matrix&);
+Matrix InvCipher(Matrix&, int, vector<Word>);
 
-void InvCipher();
-
+// HELPER FUNCTIONS
 void print(string , int, Matrix&);
+Matrix MakeMatrix(string);
+void printKey(string, int, Word, Word, Word, Word);
+void printWord(string, Word);
 
 int main(){
-    //uint8_t state[Nb][Nb];
-    vector<uint8_t> tempBytes;
-    Matrix state;
     string plaintext = ("00112233445566778899aabbccddeeff");
     unsigned int ch;
 
+    string KEY_128 = ("000102030405060708090a0b0c0d0e0f");
+    string KEY_192 = ("000102030405060708090a0b0c0d0e0f1011121314151617");
+    string KEY_256 = ("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
 
-    // Print Statements 
+    //  128 AES
+    cout << "PLAINTEXT:                 " << plaintext << endl;
+    cout << "KEY:                       " << KEY_128 << endl;
+    // vector<Word> keySchedule_128 = KeyExpansion(KEY_128, Nr_128, Nk_128);
+    // Matrix encrypted = Cipher(plaintext, Nr_128, keySchedule_128);
+    // cout << endl << endl;
+    string keyTest = "2b7e151628aed2a6abf7158809cf4f3c";
+    vector<Word> key = KeyExpansion(keyTest, Nr_128, Nk_128);
+    // Matrix decrypted = InvCipher(encrypted, Nr_128, keySchedule_128);
+
+    //  192 AES
     // cout << "PLAINTEXT:                 " << plaintext << endl;
-    // cout << "KEY:                       " << key << endl;
+    // cout << "KEY:                       " << KEY_192 << endl;
+    // vector<Word> keySchedule_192 = KeyExpansion(KEY_192, Nr_192, Nk_192);
+    // Matrix encrypted_192 = Cipher(plaintext, Nr_192, keySchedule_192);
+    // cout << endl << endl;
+    // Matrix decrypted_192 = InvCipher(encrypted_192, Nr_192, keySchedule_192);
 
-
-
-
-
-    // Create state array from hex string
-    for (int i = 0; i < plaintext.length() - 1; i++){
-        string temp;
-        temp.push_back(plaintext[i]);
-        temp.push_back(plaintext[i++]);
-        std::istringstream toByte(temp);
-        toByte >> hex >> ch; 
-        tempBytes.push_back(ch);
-        temp.clear();
-    }
-
-    // Push Bytes to state matrix
-    int byteIndex = 0;
-    for (int i = 0; i < Nb; i++){
-        for (int j = 0; j < Nb; j++){
-            state.data[j][i] = tempBytes[byteIndex];
-            byteIndex++;
-        }
-    }
-
-    // // ENCRYPT
-    // // Cipher()
-
-    // DECRYPT
-    // InvCipher()
-
+    // // 256 AES
+    // cout << "PLAINTEXT:                 " << plaintext << endl;
+    // cout << "KEY:                       " << KEY_256 << endl;
+    // vector<Word> keySchedule_256 = KeyExpansion(KEY_256, Nr_256, Nk_256);
+    // Matrix encrypted_256 = Cipher(plaintext, Nr_256, keySchedule_256);
+    // cout << endl << endl;
+    // Matrix decrypted_256 = InvCipher(encrypted_256, Nr_256, keySchedule_256);
     return 0;
 }
 
@@ -179,15 +156,12 @@ uint8_t ffAdd(uint8_t a, uint8_t b){
 
 uint8_t xtime(uint8_t b){
     uint16_t result = b << 1;
-    //cout << hex << setw(2) << setfill('0') << "b: " << int(b) << endl;
     if (result >= 0x100){
         result ^= AES_POLY;
-        //cout << hex << setw(2) << setfill('0') << "result: " << int(result) << endl;
         return result;
     } 
     else{
         return result;
-       // cout << hex << setw(2) << setfill('0') << "b: " << int(b) << endl;
     }
 }
 
@@ -200,13 +174,10 @@ uint8_t ffMultiply(uint8_t a, uint8_t b){
         if (i > 0){
             temp = xtime(temp);
         }
-        //cout << hex << setw(2) << setfill('0') << "Sum: " << int(sum) << endl;
         if (a & 0x01){
-            //cout << hex << setw(2) << setfill('0') << "sum: " << int(sum) << "temP:"  << int(temp) << endl << endl;
             sum ^= temp;
         }
         a >>= 1;
-       // cout << hex << setw(2) << setfill('0') << "After xor: " << int(sum) << endl << endl;
     }
     return sum;
 }   
@@ -239,13 +210,6 @@ Matrix ShiftRows(Matrix& state){
             shiftRows.data[i][j] = state.data[i][newCol];
         }
     }
-    cout << endl << "SHIFTED ROWS" <<  endl;
-     for(int i = 0; i < Nb; i++){
-        for (int j = 0; j < Nb; j++){
-            cout << hex << setw(2) << setfill('0') << static_cast<int>(shiftRows.data[i][j]); // output the state
-        }
-        cout << endl;
-    }
     return shiftRows;
 }
 
@@ -265,43 +229,58 @@ Matrix MixColumns(Matrix& state){
 
 
 // **************************************************************
-Matrix AddRoundKey(Matrix& state, Word& roundKey){
+Matrix AddRoundKey(Matrix& state, Word& w0, Word& w1, Word& w2, Word& w3){
+    vector<Word> temp;
+    temp.push_back(w0);
+    temp.push_back(w1);
+    temp.push_back(w2);
+    temp.push_back(w3);
     for (int i = 0; i < Nb; i++){
-        for (int j = 0; j < Nb; j++){
-            state.data[i][j] ^= roundKey.data[i];
+        for(int j = 0; j < Nb; j++){
+            state.data[j][i] ^= temp[i].data[j];
         }
     }
+    print("ADD ROUND KEY", 0, state);
     return state;
 }
 
 
 // **************************************************************
 // Steps for encryption
-Matrix Cipher(Matrix& state, int Nr, Word& w){
-
+Matrix Cipher(string plaintext, int Nr, vector<Word> w){
+    Matrix state;
+    state = MakeMatrix(plaintext);
     cout << "CIPHER (ENCRYPT): " << endl;
     int roundcount = 0;
     print("input", roundcount, state);
-    //AddRoundKey(state, w[0, Nb - 1]);
-    for (int round = 0; round < Nr-1; round++){
-       // print("k_sch", roundcount, key);
+    printKey("k_sch", roundcount, w[0], w[1], w[2], w[3]);
+    state = AddRoundKey(state, w[0], w[1], w[2], w[3]);
+    for (int round = 1; round < Nr; round++){
+        roundcount++;
         print("start", roundcount, state);
+
         state = SubBytes(state);
         print("s_box", roundcount, state);
+
         state = ShiftRows(state);
         print("s_row", roundcount, state);
+
         state = MixColumns(state);
         print("m_col", roundcount, state);
-        //state = AddRoundKey(state, w, int);
-        cout <<dec << "Round:" << roundcount << endl;; // dec sets output back to decimal
+
+        printKey("k_sch", roundcount,  w[4*round], w[4*round+1], w[4*round+2], w[4*round+3]);
+        state = AddRoundKey(state, w[4*round], w[4*round+1], w[4*round+2], w[4*round+3]);
     }
     roundcount++;
         print("start", roundcount, state);
+
         state = SubBytes(state);
         print("s_box", roundcount, state);
+
         state = ShiftRows(state);
         print("s_row", roundcount, state);
-    //state = AddRoundKey(state, w, int);
+
+    state = AddRoundKey(state, w[4*Nr], w[4*Nr+1], w[4*Nr+2], w[4*Nr+3]);
 
     print("output", roundcount, state);
     return state;
@@ -326,6 +305,7 @@ Word SubWord(Word& word){
 // **************************************************************
 Word RotWord(Word& word){
     Word rotWord;
+    printWord("IN ROT WORD: ", word);
     rotWord.data[0] = word.data[1];
     rotWord.data[1] = word.data[2];
     rotWord.data[2] = word.data[3];
@@ -335,33 +315,67 @@ Word RotWord(Word& word){
 
 
 // **************************************************************
-void KeyExpansion(uint8_t key[], int Nb, int Nr, int Nk, int keyLength){
+vector<Word> KeyExpansion(string key, int Nr, int Nk){
     vector<Word> w;
+    vector<Word> keySched;
     Word temp;
+    vector<uint8_t> keyVect;
 
-    for (int j = 0 ; j < Nk; j++) {
-        w.push_back({key[j * 4], key[j * 4 + 1], key[j * 4 + 2], key[j * 4 + 3]});
+        // Parse the string of hex characters into bytes
+    for (int i = 0; i < key.length(); i += 2) {
+        string tempStr = key.substr(i, 2);
+        uint32_t ch;
+        istringstream toByte(tempStr);
+        toByte >> hex >> ch;
+        keyVect.push_back(ch);
     }
 
-    for (int i = 0; i < (Nb * (Nr + 1)); i++){
-        temp = w[i];
+    // Output keyVect for debugging
+    for (int i = 0; i < keyVect.size(); i++) {
+        cout <<hex << setw(2) << setfill('0') << int(keyVect[i]) << endl;
+    }
+
+    // Construct the initial key schedule
+    for (int j = 0; j < Nk; j++) {
+        Word word;
+        for (int k = 0; k < 4; k++) {
+            word.data[k] = keyVect[j * 4 + k];
+        }
+        w.push_back(word);
+    }
+
+    printKey("after fill", 0, w[0], w[1], w[2], w[3]);
+    // Expand the key schedule
+    int round = 1;
+    for (int i = Nk; i < Nb * (Nr + 1); i++) {
+        temp = w[i - 1];
         if (i % Nk == 0) {
             temp = RotWord(temp);
+            printWord("rot word", temp);
             temp = SubWord(temp);
-            temp.data[0] ^= Rcon[i/Nk]; 
-        }
-        else if (Nk > 6 && i % Nk == 4){
+            printWord("sub word", temp);
+            temp.data[0] ^= Rcon[i / Nk];
+            printWord("rcon", temp);
+            round++;
+        } else if (Nk > 6 && i % Nk == 4) {
             temp = SubWord(temp);
         }
 
+        // for (int j = 0; j < Nk; j++) {
+        //     Word word;
+        //     for (int k = 0; k < 4; k++) {
+        //         w[i] = temp.data[k] ^ w[i - Nk].data[k];
+        //     }
+        //     printWord("XOR WITH OTHER", keySched[i]);
+        //     keySched.push_back(word);
+            
         for (int j = 0; j < 4; j++) {
             temp.data[j] ^= w[i - Nk].data[j];
         }
-
-        // Add the modified word to w
-        w.push_back(temp);
-    }      
-    return;
+        // // Add the modified word
+        printKey("after fill", 0, w[0], w[1], w[2], w[3]);
+    }
+    return w;
 }
 
 
@@ -381,13 +395,6 @@ Matrix InvShiftRows(Matrix& state){
             int newCol = (j + (4 - i)) % Nb; 
             invShiftRows.data[i][j] = state.data[i][newCol];
         }
-    }
-    cout << endl << " INVERSE SHIFTED ROWS" <<  endl;
-     for(int i = 0; i < Nb; i++){
-        for (int j = 0; j < Nb; j++){
-            cout << hex << setw(2) << setfill('0') << static_cast<int>(invShiftRows.data[i][j]); // output the state   
-        }
-        cout << endl;
     }
     return invShiftRows;
 }
@@ -439,16 +446,97 @@ Matrix InvMixColumns(Matrix& state){
 
 
 // **************************************************************
-void InvCipher(){
-    return;
+Matrix InvCipher(Matrix& state, int Nr, vector<Word> w){
+    cout << "INVERSE CIPHER (DECRYPT): " << endl;
+    int roundcount = Nr;
+    print("input", roundcount, state);
+    state = AddRoundKey(state, w[4*Nr], w[4*Nr+1], w[4*Nr+2], w[4*Nr+3]);
+    for (int round = Nr - 1; round >= 1; round--){
+       // print("k_sch", roundcount, key);
+        print("start", roundcount, state);
+
+        state = InvShiftRows(state);
+        print("is_row", roundcount, state);
+
+        state = InvSubBytes(state);
+        print("is_box", roundcount, state);
+
+        state = InvMixColumns(state);
+        print("im_col", roundcount, state);
+
+        state = AddRoundKey(state, w[4*round], w[4*round+1], w[4*round+2], w[4*round+3]);
+    }
+    roundcount++;
+        print("start", roundcount, state);
+
+        state = SubBytes(state);
+        print("s_box", roundcount, state);
+
+        state = ShiftRows(state);
+        print("s_row", roundcount, state);
+
+    state = AddRoundKey(state, w[0], w[1], w[2], w[3]);
+
+    print("output", roundcount, state);
+    return state;
 }
 
 
 
 void print(string label, int round, Matrix& state){
+    cout << "round[ " << dec << round << " ]." << label << "      ";
     for (int i = 0; i < Nb; i++){
         for (int j = 0; j < Nb; j++){
-            cout << "round[ " << dec << round << " ]." << label << hex << setw(2) << setfill('0') << int(state.data[j][i]) << "  ";
+           cout << hex << setw(2) << setfill('0') << int(state.data[j][i]) << "  ";
         }
     }
+    cout << endl;
+}
+
+Matrix MakeMatrix(string text){
+    vector<uint8_t> tempBytes;
+    Matrix state;
+    uint32_t ch;
+    for (int i = 0; i < text.length() - 1; i++){
+        string temp;
+        temp.push_back(text[i]);
+        temp.push_back(text[i++]);
+        std::istringstream toByte(temp);
+        toByte >> hex >> ch; 
+        tempBytes.push_back(ch);
+        temp.clear();
+    }
+
+    // Push Bytes to state matrix
+    int byteIndex = 0;
+    for (int i = 0; i < Nb; i++){
+        for (int j = 0; j < Nb; j++){
+            state.data[j][i] = tempBytes[byteIndex];
+            byteIndex++;
+        }
+    }
+    return state;
+}
+
+void printKey(string label, int round, Word w0, Word w1, Word w2, Word w3){
+    vector<Word> temp;
+    temp.push_back(w0);
+    temp.push_back(w1);
+    temp.push_back(w2);
+    temp.push_back(w3);
+    cout << "round[ " << dec << round << " ]." << label << "      ";
+    for (int i = 0; i < Nb; i++){
+        for(int j = 0; j < Nb; j++)
+            cout << hex << setw(2) << setfill('0') << int(temp[i].data[j]) << "  ";
+    }
+    cout << endl;
+}
+
+void printWord(string label, Word temp){
+    cout << label << "      ";
+    for (int i = 0; i < Nb; i++){
+            cout << hex << setw(2) << setfill('0') << int(temp.data[i]) << "  ";
+    }
+    cout << endl;
+    return;
 }
