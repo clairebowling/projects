@@ -123,8 +123,6 @@ int main(){
     vector<Word> keySchedule_128 = KeyExpansion(KEY_128, Nr_128, Nk_128);
     Matrix encrypted = Cipher(plaintext, Nr_128, keySchedule_128);
     cout << endl << endl;
-    // string keyTest = "2b7e151628aed2a6abf7158809cf4f3c";
-    // vector<Word> key = KeyExpansion(keyTest, Nr_128, Nk_128);
     Matrix decrypted = InvCipher(encrypted, Nr_128, keySchedule_128);
     cout << endl << endl;
 
@@ -345,11 +343,8 @@ vector<Word> KeyExpansion(string key, int Nr, int Nk){
         temp = w[i - 1];
         if (i % Nk == 0) {
             temp = RotWord(temp);
-            //printWord("rot word", temp);
             temp = SubWord(temp);
-            //printWord("sub word", temp);
             temp.data[0] ^= Rcon[i / Nk];
-            //printWord("rcon", temp);
             round++;
         } else if (Nk > 6 && i % Nk == 4) {
             temp = SubWord(temp);
@@ -519,13 +514,4 @@ void printKey(string label, int round, Word w0, Word w1, Word w2, Word w3){
             cout << hex << setw(2) << setfill('0') << int(temp[i].data[j]) << "  ";
     }
     cout << endl;
-}
-
-void printWord(string label, Word temp){
-    cout << label << "      ";
-    for (int i = 0; i < Nb; i++){
-            cout << hex << setw(2) << setfill('0') << int(temp.data[i]) << "  ";
-    }
-    cout << endl;
-    return;
 }
