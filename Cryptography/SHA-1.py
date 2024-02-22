@@ -1,10 +1,8 @@
-# Implementation of SHA-1 from FIPS 180-4
-
 def rotate_left(x, n):
     return (((x << n) | (x >> (32 - (n % 32)))) & 0xFFFFFFFF)
 
 def Ch(x, y, z):
-    return ((x & y) ^ (~x & z))
+    return ((x & y) ^ ((~x) & z))
 
 def Parity(x, y, z):
     return (x ^ y ^ z)
@@ -12,7 +10,8 @@ def Parity(x, y, z):
 def Maj(x, y, z):
     return ((x & y) ^ (x & z) ^ (y & z))
 
-def main():
+
+def sha1(message):
     h0 = 0x67452301
     h1 = 0xEFCDAB89
     h2 = 0x98BADCFE
@@ -20,25 +19,43 @@ def main():
     h4 = 0xC3D2E1F0
 
     # Pre-processing and padding of original message
-    message = "hello world."
-    original_len = len(message) * 8
-    message += chr(128)
+    msg_length = len(message)
 
-    while (len(message) * 8) % 512 != 448:
-        message += chr(0)
+    # print(msg_length)
 
-    message += original_len.to_bytes(8, byteorder='big').decode()
+    # Convert message string to 8-bit ascii equivalent
+    padded_message = ''.join(format(ord(ch), '08b') for ch in message)
+    # Add 1
+    padded_message += '1'
+    #Pad with zeros
+    l = msg_length * 8
+    # k = (448 - (l + 1) ) % 512
+    while len(padded_message) % 512 != 448:
+        padded_message += '0'
 
-    chunks = [message[i:i+64] for i in range(0, len(message), 64)]
+    # print(bits_length)
+
+    padded_message += format(l, '064b')
+
+    # print("Padded Message in binary:", padded_message)
+
+    chunks = [padded_message[i:i+512] for i in range(0, len(padded_message), 512)]
 
     # break message into 512-bit chunks
     for chunk in chunks:
+        print(len(chunk))
+        words = [chunk[i:i+32] for i in range(0, len(chunk), 32)]
+        print(word for word in words)
         w = [0] * 80
-        for i in range(0, 64, 4):
-            w[i//4] = int.from_bytes(chunk[i:i+4].encode(), byteorder='big')
+        for i in range(0, len(chunk), 32):
+            w[i] = int.from_bytes(chunk[i:i*32].encode(), byteorder='big')
+            # int(chunk[i:i*32], base=2)
+        #     block = chunk[i:i+32]
+        #     w[i] = int(block, 2)
+
 
         for i in range(16, 80):
-            w[i] = rotate_left(w[i-3] ^ w[i-8] ^ w[i-14] ^ w[i-16], 1)
+            w[i] = rotate_left((w[i-3] ^ w[i-8] ^ w[i-14] ^ w[i-16]), 1)
 
         a = h0
         b = h1
@@ -74,8 +91,14 @@ def main():
         h3 = (h3 + d) & 0xFFFFFFFF
         h4 = (h4 + e) & 0xFFFFFFFF
 
-    hh = (rotate_left(h0, 128) | rotate_left(h1, 96) | rotate_left(h2, 64) | rotate_left(h3, 32) | h4)
-    print(hex(hh))
+    hash = (h0 << 128) | (h1 << 96) | (h2 << 64) | (h3 << 32) | h4
+    return format(hash, '040x')
 
 if __name__ == "__main__":
-    main()
+
+    messages = [
+        "hello world."]
+
+    for message in messages:
+        digest = sha1(message)
+        print(digest)
