@@ -1,16 +1,27 @@
-def rotate_left(x, n):
-    return (((x << n) | (x >> (32 - (n % 32)))) & 0xFFFFFFFF)
+# Implementation of SHA-1 as specified in FIPS 180-4 
 
+#########################################################################
+# Rotate left (circular left shift) from section 3.2
+def rotate_left(x, n):
+    return (((x << n) | (x >> (32 - n))) & 0xFFFFFFFF)
+
+#########################################################################
+# section 4.1.1 when 0 <= t <= 19
 def Ch(x, y, z):
     return ((x & y) ^ ((~x) & z))
 
+#########################################################################
+# section 4.1.1 when 20 <= t <= 19 and 60 <= t <= 79
 def Parity(x, y, z):
     return (x ^ y ^ z)
 
+#########################################################################
+# section 4.1.1 when 40 <= t <= 59
 def Maj(x, y, z):
     return ((x & y) ^ (x & z) ^ (y & z))
 
-
+#########################################################################
+# calculate hash value
 def sha1(message):
     h0 = 0x67452301
     h1 = 0xEFCDAB89
@@ -21,42 +32,30 @@ def sha1(message):
     # Pre-processing and padding of original message
     msg_length = len(message)
 
-    # print(msg_length)
-
     # Convert message string to 8-bit ascii equivalent
     padded_message = ''.join(format(ord(ch), '08b') for ch in message)
     # Add 1
     padded_message += '1'
-    #Pad with zeros
     l = msg_length * 8
-    # k = (448 - (l + 1) ) % 512
+    # Pad message with 0s such that 
     while len(padded_message) % 512 != 448:
         padded_message += '0'
 
-    # print(bits_length)
-
     padded_message += format(l, '064b')
 
-    # print("Padded Message in binary:", padded_message)
-
+    
     chunks = [padded_message[i:i+512] for i in range(0, len(padded_message), 512)]
 
     # break message into 512-bit chunks
     for chunk in chunks:
-        print(len(chunk))
-        words = [chunk[i:i+32] for i in range(0, len(chunk), 32)]
-        print(word for word in words)
         w = [0] * 80
-        for i in range(0, len(chunk), 32):
-            w[i] = int.from_bytes(chunk[i:i*32].encode(), byteorder='big')
-            # int(chunk[i:i*32], base=2)
-        #     block = chunk[i:i+32]
-        #     w[i] = int(block, 2)
-
+        for i in range(0, 16):
+            w[i] = int(chunk[i*32:(i*32)+32], 2)
 
         for i in range(16, 80):
             w[i] = rotate_left((w[i-3] ^ w[i-8] ^ w[i-14] ^ w[i-16]), 1)
 
+        # initialize hash value for this chunk
         a = h0
         b = h1
         c = h2
@@ -85,19 +84,26 @@ def sha1(message):
             b = a
             a = temp
 
+        # add this chunk's hash value
         h0 = (h0 + a) & 0xFFFFFFFF
         h1 = (h1 + b) & 0xFFFFFFFF
         h2 = (h2 + c) & 0xFFFFFFFF
         h3 = (h3 + d) & 0xFFFFFFFF
         h4 = (h4 + e) & 0xFFFFFFFF
 
+    # return final hash value
     hash = (h0 << 128) | (h1 << 96) | (h2 << 64) | (h3 << 32) | h4
     return format(hash, '040x')
 
 if __name__ == "__main__":
 
     messages = [
-        "hello world."]
+        "This is a test of SHA-1.",
+        "Kerckhoff's principle is the foundation on which modern cryptography is built.",
+        "SHA-1 is no longer considered a secure hashing algorithm.",
+        "SHA-2 or SHA-3 should be used in place of SHA-1.",
+        "Never roll your own crypto!" 
+        ]
 
     for message in messages:
         digest = sha1(message)
